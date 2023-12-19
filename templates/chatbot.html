@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Website GPT</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {
+      background-color: rgb(15, 22, 33);
+      height: 1500px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #333241;
+      height: 100%;
+    }
+
+    .vscheck{
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .Load1{
+
+      text-align: center;
+    }
+
+    .Load2{
+
+      text-align: center;
+    }
+
+    .vis{
+
+      text-align: center;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;} 
+    }
+
+    input {
+      margin: auto;
+      text-align: center;
+    
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <br><br>
+      <h4 style="color: rgb(255, 255, 255) ; text-align:center">Option Menu</h4>
+      <br>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="Website-input-group">
+        <input style="background-color: rgb(26, 38, 57); color: rgb(255, 255, 255)" type="text" class="form-control" placeholder="Enter Website.." name="Website_input" >
+      </div>
+      <br> <br>
+      <input style="background-color: rgb(26, 38, 57)" type="checkbox" id="checkvs" name="checkvs" data-toggle='collapse' data-target='#collapse1'>
+        <label style="color: rgb(255, 255, 255)" for="checkvs">Use Created Vector Store</label> <br>
+        {% csrf_token %}
+        <input style="background-color: rgb(26, 38, 57); color: rgb(255, 255, 255)" type="text" name="VSdir" class="collapse 1" id='collapse1' placeholder="The Vector store should be in the current directory ">
+      <br>
+      <div class="Embedtype">
+      <ul class="nav nav-pills nav-stacked">
+        <li><h5 style="color: rgb(255, 255, 255) ; text-align:center" >Select Sentence Embedding:</h5></li>
+        <li><input style="background-color: rgb(26, 38, 57)" type="checkbox" id="check" name="check1" checked>
+          <label style="color: rgb(255, 255, 255)" for="check1">All MiniLM L6 V2 - Small/Fastest</label></li>
+        <li><input style="background-color: rgb(26, 38, 57)" type="checkbox" id="check" name="check2">
+          <label style="color: rgb(255, 255, 255)" for="check2">E5 base - Medium/Fast</label></li>
+        <li><input style="background-color: rgb(26, 38, 57)" type="checkbox" id="check" name="check3">
+          <label style="color: rgb(255, 255, 255)" for="check3">E5 large V2 - Large/Slow</label></li>
+      </ul>
+      </div>
+      <br><br>
+      <span class="Website-group-btn">
+          <button style="background-color: rgb(26, 38, 57)" class="form-control" type="submit" name="process">
+            <span  class="glyphicon glyphicon-ok"></span>
+          </button>
+        </span>
+        <br><br>
+        <h5 style="color: rgb(255, 255, 255) ; text-align:center" >Delete Existing Vector Store:</h5>
+        <button style="background-color: rgb(26, 38, 57)" class="form-control" type="submit" name="del">
+        <span class="glyphicon glyphicon-trash"></span>
+        </button>
+        <br><br>
+        <form method="POST">
+        {% csrf_token %}
+        <div class="Load1">
+      <button  id="GPT4_load_btn" style="background-color: #333241 ; color: rgb(255, 255, 255)" type="submit" name="GPT4_load_btn"  hidden>
+        (First time Run) <br /> Load Flan Alpaca GPT 4 <br /> Approximate Time: 20 - 30 sec
+       </button>
+      </div>
+      </form>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="Load2">
+      <button  id="llama_load_btn" style="background-color: #333241 ; color: rgb(255, 255, 255)" type="submit" name="llama_load_btn"  hidden>
+        (First time Run) <br /> Load Flan Alpaca GPT 4 <br /> Approximate Time: 20 - 30 sec
+       </button>
+      </div>
+      </form>
+        {% if Loadedvs %}
+      <h5 style="text-align:center"><span class="label label-success">{{Loadedvs}}</span></h5>
+      {% else %}
+      <h5 style="text-align:center"> <span  class="label label-danger">{{errorLoadedvs}}</span></h5> 
+      {% endif %}
+      </form>
+    </div>
+
+    <div class="col-sm-9">
+      <h2 style="color: rgb(255, 255, 255) ; text-align:center"> Website GPT <span class="glyphicon glyphicon-file"> </span> <span class="glyphicon glyphicon-search"></span> </h2>
+      <br>
+      <h5 style="color: rgb(255, 255, 255)"><span class="glyphicon glyphicon-comment"></span>  Chat With Website</h5>
+      <h5> <span class="label label-info">Open AI LLM</span>  <span class="label label-info">Google T5 Flan</span>  <span class="label label-info">Flan Alpaca GPT 4</span></h5>
+      <form method="POST">
+      {% csrf_token %}
+      <div>
+        <label style="color: rgb(255, 255, 255) ; text-align:center" for="LLMs">Choose a LLM :  </label>
+        <select style="color: rgb(255, 255, 255) ; background-color: rgb(26, 38, 57); text-align:center" id="LLMs" name="LLMs">
+          <option value="OpenAI">Open AI (Defult)</option>
+          <option value="T5Flan">Google T5 Flan</option>
+          <option value="FlanAlpacaGPT4">Flan Alpaca GPT 4</option>
+          <option value="Llama2">Meta Llama 2 7B</option>
+        </select>
+      </div>
+      <br>
+
+
+      <p id="OAI" style="color: rgb(255, 255, 255) ; text-align:center"  >
+        Approximate Time: 2 - 5 sec
+      </p>
+      <p id="GTF5" style="color: rgb(255, 255, 255) ; text-align:center" hidden >
+        Approximate Time: 5 - 10 sec 
+      </p>
+      <p id="GPT4" style="color: rgb(255, 255, 255) ; text-align:center" hidden >
+        Approximate Time: 20 - 60 sec
+      </p>
+      <p id="Llam2" style="color: rgb(255, 255, 255) ; text-align:center" hidden >
+        Approximate Time: 20 - 60 sec
+      </p>
+
+
+
+        {% csrf_token %}
+      <div class="User-input-group ">
+        <input style="background-color: #333241 ; color: rgb(255, 255, 255); text-align:center" type="text" class="form-control " placeholder="Ask Question" name="User_Input">
+        <span class="User-group-btn">
+        <button style="background-color: #333241" class="form-control" type="submit" name="chat_btn" id="LLMs">
+        <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        </span>
+        </div>
+      </form>
+
+
+      <br><br>
+      <div class="Output">
+      {% if answer %}
+      <h2 style="color: rgb(255, 255, 255) ">Result</h2>
+      <h5 style="color: rgb(255, 255, 255) "><span class="label label-success">Output:</span></h5><br>
+      <p style="color: rgb(255, 255, 255)">{{ answer }}</p>
+      {% else %}
+      <span style="color: rgb(255, 255, 255)" class="label label-danger">{{ErrorMsg}}</span>
+      <h5 style="text-align:center"><span style="color: rgb(255, 255, 255)" class="label label-success">{{ConfMsg}}</span></h5>
+      {% endif %}
+      <br>
+      {% if sources %}
+      <h3 style="color: rgb(255, 255, 255)">References:</h3>
+      <p style="color: rgb(255, 255, 255)">{{ sources }}</p>
+      <h5><span class="label label-success">Sources:</span></h5><br>
+      <p style="color: rgb(255, 255, 255)"><a href="{{ Websites }}">{{ Websites }}</a></p>
+      <br>
+      <form method="POST">
+      <div>
+        {% csrf_token %}
+      <button class="form-control" style="background-color: #333241 ; color: rgb(255, 255, 255)" type="submit" name="viz_btn">
+        Click to Visualize Vector Database
+        </button>
+        <br>
+        {{ No_vis }}
+        <div class="vis">
+        <button id="clo_btn" style="background-color: #333241 ; color: rgb(255, 255, 255)" type="submit" name="clo_btn">
+          Close Visualization
+          </button>
+        </div>
+      </form>
+    </div>
+      {% else %}
+      <p></p>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Footer Text</p>
+</footer>
+
+
+</body>
+
+<script>
+  // This function unchecks all checkboxes except the one that is checked.
+  function uncheckOtherCheckboxes(checkedCheckbox) {
+    const checkboxes = document.querySelectorAll("input[id='check']");
+    for (const checkbox of checkboxes) {
+      if (checkbox !== checkedCheckbox) {
+        checkbox.checked = false;
+      }
+    }
+  }
+
+  // When a checkbox is checked, call the uncheckOtherCheckboxes function.
+  document.querySelectorAll("input[id='check']").forEach((checkbox) => {
+    checkbox.addEventListener("click", (event) => {
+      uncheckOtherCheckboxes(event.target);
+    });
+  });
+
+  function hideStateDropdown() {
+    var LLM = document.getElementById("LLMs");
+    var btn1 = document.getElementById("GPT4_load_btn");
+    var btn2 = document.getElementById("llama_load_btn");
+    var t1 = document.getElementById("OAI");
+    var t2 = document.getElementById("GTF5");
+    var t3 = document.getElementById("GPT4");
+    var t4 = document.getElementById("Llam2");
+
+    if (LLM.value === "FlanAlpacaGPT4") {
+      btn1.hidden = false;
+    } else {
+      btn1.hidden = true;
+    }
+    
+    if (LLM.value === "Llama2") {
+      btn2.hidden = false;
+    } else {
+      btn2.hidden = true;
+    }
+
+    if (LLM.value === "OpenAI") {
+      t1.hidden = false;
+    } else {
+      t1.hidden = true;
+    }
+    
+    if (LLM.value === "T5Flan") {
+      t2.hidden = false;
+    } else {
+      t2.hidden = true;
+    }
+
+    if (LLM.value === "FlanAlpacaGPT4") {
+      t3.hidden = false;
+    } else {
+      t3.hidden = true;
+    }
+
+    if (LLM.value === "Llama2") {
+      t4.hidden = false;
+    } else {
+      t4.hidden = true;
+    }
+
+  }
+// When the "country" dropdown changes, call the "hideStateDropdown" function.
+  document.getElementById("LLMs").addEventListener("change", hideStateDropdown);
+
+
+
+
+</script>
+</html>
